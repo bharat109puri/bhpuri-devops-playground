@@ -34,7 +34,7 @@ jobs:
           - stack: node
             command: node --check apps/demo-node/src/server.js
           - stack: ai-python
-            command: python -m compileall apps/ai-rag/app apps/ai-langgraph/app
+            command: python -m pip install -r apps/ai-rag/requirements.txt -r apps/ai-langgraph/requirements.txt && PYTHONPATH=apps/ai-rag pytest apps/ai-rag/tests && python -m compileall apps/ai-langgraph/app
           - stack: java
             command: mvn --batch-mode -f apps/demo-spring/pom.xml test
           - stack: php
