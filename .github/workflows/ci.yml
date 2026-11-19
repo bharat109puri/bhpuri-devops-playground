@@ -35,6 +35,10 @@ jobs:
             command: node --check apps/demo-node/src/server.js
           - stack: ai-python
             command: python -m compileall apps/ai-rag/app apps/ai-langgraph/app
+          - stack: java
+            command: mvn --batch-mode -f apps/demo-spring/pom.xml test
+          - stack: php
+            command: php -l apps/demo-php/public/index.php
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -46,6 +50,12 @@ jobs:
       - uses: actions/setup-python@v5
         if: matrix.stack == 'ai-python'
         with: {python-version: '3.13'}
+      - uses: actions/setup-java@v4
+        if: matrix.stack == 'java'
+        with: {distribution: temurin, java-version: '21'}
+      - uses: shivammathur/setup-php@v2
+        if: matrix.stack == 'php'
+        with: {php-version: '8.3'}
       - run: ${{ matrix.command }}
   policy:
     runs-on: ubuntu-latest
