@@ -4,7 +4,7 @@ metadata:
   name: demo-api
   namespace: argocd
 spec:
-  project: default
+  project: playground
   source:
     repoURL: https://github.com/bharat109puri/bhpuri-devops-playground.git
     targetRevision: main

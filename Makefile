@@ -16,7 +16,9 @@ argocd-install: ## Install Argo CD with Helm
 	helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace --set server.service.type=ClusterIP --wait --timeout 10m
 
 bootstrap: up argocd-install ## Create cluster, install Argo CD, and apply root application
+	kubectl apply -f argocd/projects/playground.yaml
 	kubectl apply -f argocd/root-app.yaml
+	kubectl apply -f argocd/applications/platform.yaml
 
 argocd-password: ## Print the initial Argo CD admin password
 	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode; echo

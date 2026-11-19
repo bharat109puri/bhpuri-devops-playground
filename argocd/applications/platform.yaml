@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-foundations
+  namespace: argocd
+spec:
+  project: playground
+  source:
+    repoURL: https://github.com/bharat109puri/bhpuri-devops-playground.git
+    targetRevision: main
+    path: gitops/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: playground
+  syncPolicy:
+    automated: {prune: true, selfHeal: true}
+    syncOptions: [CreateNamespace=true, ServerSideApply=true]
