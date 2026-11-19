@@ -1,0 +1,2 @@
+nameOverride: ai-rag
+image: {repository: ghcr.io/bharat109puri/ai-rag, tag: "0.1.0"}

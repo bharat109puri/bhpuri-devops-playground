@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "web-service.name" . }}
+  labels: {app.kubernetes.io/name: {{ include "web-service.name" . }}}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector: {matchLabels: {app.kubernetes.io/name: {{ include "web-service.name" . }}}}
+  template:
+    metadata: {labels: {app.kubernetes.io/name: {{ include "web-service.name" . }}}}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: {{ include "web-service.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports: [{containerPort: {{ .Values.service.targetPort }} }]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            {{- if eq .Values.probe.type "tcp" }}
+            tcpSocket: {port: {{ .Values.service.targetPort }}}
+            {{- else }}
+            httpGet: {path: {{ .Values.probe.path }}, port: {{ .Values.service.targetPort }}}
+            {{- end }}
+            initialDelaySeconds: 5
+          livenessProbe:
+            {{- if eq .Values.probe.type "tcp" }}
+            tcpSocket: {port: {{ .Values.service.targetPort }}}
+            {{- else }}
+            httpGet: {path: {{ .Values.probe.path }}, port: {{ .Values.service.targetPort }}}
+            {{- end }}
+            initialDelaySeconds: 15

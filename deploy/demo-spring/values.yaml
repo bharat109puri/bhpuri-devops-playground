@@ -1,0 +1,2 @@
+nameOverride: demo-spring
+image: {repository: ghcr.io/bharat109puri/demo-spring, tag: "0.1.0"}

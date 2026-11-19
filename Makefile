@@ -48,6 +48,11 @@ build-images: ## Build all local application images
 	docker build --tag demo-api:local apps/demo-api
 	docker build --tag demo-node:local apps/demo-node
 	docker build --tag demo-go:local apps/demo-go
+	docker build --tag demo-spring:local apps/demo-spring
+	docker build --tag demo-php:local apps/demo-php
+	docker build --tag ai-rag:local apps/ai-rag
+	docker build --tag ai-langgraph:local apps/ai-langgraph
+	docker build --tag mcp-tool-server:local apps/mcp-tool-server
 
 compose-up: ## Run all application stacks with Docker Compose
 	docker compose up --build

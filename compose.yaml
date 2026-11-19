@@ -23,3 +23,33 @@ services:
     read_only: true
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+  demo-spring:
+    build: ./apps/demo-spring
+    ports: ["8083:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  demo-php:
+    build: ./apps/demo-php
+    ports: ["8084:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  ai-rag:
+    build: ./apps/ai-rag
+    ports: ["8085:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  ai-langgraph:
+    build: ./apps/ai-langgraph
+    ports: ["8086:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  mcp-tool-server:
+    build: ./apps/mcp-tool-server
+    ports: ["8087:8000"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]

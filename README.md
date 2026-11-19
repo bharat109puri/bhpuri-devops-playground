@@ -8,6 +8,7 @@ An opinionated, reproducible local platform lab for demonstrating modern deliver
 
 - Local multi-node Kubernetes with Kind and one-command automation through `make`
 - Hardened Python, Node.js, and Go container examples
+- Java Spring Boot, PHP, local RAG, LangGraph, and MCP server examples
 - Helm schema validation, HPA, PDB, NetworkPolicy, probes, resource limits, and non-root security context
 - Argo CD project and declarative GitOps foundations
 - Kustomize environment overlay and Kubernetes Pod Security admission labels
@@ -64,7 +65,7 @@ make test-gha      # execute compatible workflows locally with act
 make observability-install
 ```
 
-To run every service without Kubernetes, use Docker Compose. The endpoints are mapped to `8080`, `8081`, and `8082` respectively:
+To run every service without Kubernetes, use Docker Compose. The HTTP endpoints are mapped from `8080` through `8087`:
 
 ```sh
 make compose-up
@@ -81,8 +82,14 @@ Every service listens on port `8080` and exposes `GET /healthz`.
 | `demo-api` | Flask + Gunicorn | multi-stage Python virtual environment, non-root runtime |
 | `demo-node` | Node.js HTTP | minimal Alpine, non-root runtime |
 | `demo-go` | Go HTTP | static binary in distroless non-root image |
+| `demo-spring` | Java Spring Boot | Maven build with Java 21 JRE runtime |
+| `demo-php` | PHP | non-root PHP CLI lab server |
+| `ai-rag` | FastAPI + LangChain | local deterministic retrieval, no API key required |
+| `ai-langgraph` | FastAPI + LangGraph | deployable state-graph workflow |
+| `mcp-tool-server` | MCP Python SDK | tools, resource, and prompt over Streamable HTTP |
 
 See [application stack notes](docs/application-stacks.md) for the design differences.
+Read [the AI and MCP guide](docs/ai-and-mcp.md) before connecting model credentials or an MCP host.
 
 ## Repository layout
 

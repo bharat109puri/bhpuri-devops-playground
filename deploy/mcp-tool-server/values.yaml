@@ -1,0 +1,4 @@
+nameOverride: mcp-tool-server
+image: {repository: ghcr.io/bharat109puri/mcp-tool-server, tag: "0.1.0"}
+service: {port: 8000, targetPort: 8000}
+probe: {type: tcp}

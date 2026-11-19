@@ -21,6 +21,16 @@ jobs:
             context: apps/demo-node
           - name: demo-go
             context: apps/demo-go
+          - name: demo-spring
+            context: apps/demo-spring
+          - name: demo-php
+            context: apps/demo-php
+          - name: ai-rag
+            context: apps/ai-rag
+          - name: ai-langgraph
+            context: apps/ai-langgraph
+          - name: mcp-tool-server
+            context: apps/mcp-tool-server
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
