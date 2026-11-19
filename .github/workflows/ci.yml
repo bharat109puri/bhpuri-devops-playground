@@ -41,13 +41,13 @@ jobs:
             command: php -l apps/demo-php/public/index.php
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: matrix.stack == 'python'
         with: {python-version: '3.13'}
       - uses: actions/setup-node@v4
         if: matrix.stack == 'node'
         with: {node-version: '22'}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: matrix.stack == 'ai-python'
         with: {python-version: '3.13'}
       - uses: actions/setup-java@v4
