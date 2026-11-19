@@ -64,6 +64,12 @@ make test-gha      # execute compatible workflows locally with act
 make observability-install
 ```
 
+To run every service without Kubernetes, use Docker Compose. The endpoints are mapped to `8080`, `8081`, and `8082` respectively:
+
+```sh
+make compose-up
+```
+
 The CI runner has a full Docker environment, whereas some hosted/sandboxed terminals do not allow local port binding. GitHub Actions is the canonical container verification path.
 
 ## Applications

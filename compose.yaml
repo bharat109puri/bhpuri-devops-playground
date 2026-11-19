@@ -1,0 +1,25 @@
+name: devops-playground
+services:
+  demo-api:
+    build: ./apps/demo-api
+    ports: ["8080:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  demo-node:
+    build: ./apps/demo-node
+    ports: ["8081:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  demo-go:
+    build: ./apps/demo-go
+    ports: ["8082:8080"]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]

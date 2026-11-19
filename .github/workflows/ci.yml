@@ -28,7 +28,7 @@ jobs:
       matrix:
         include:
           - stack: python
-            command: python -m compileall apps/demo-api/src
+            command: python -m pip install -r apps/demo-api/requirements-dev.txt && pytest apps/demo-api/tests
           - stack: node
             command: node --check apps/demo-node/src/server.js
     steps:

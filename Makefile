@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install test-gha verify lint render build-images
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install test-gha verify lint render build-images compose-up compose-down
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -48,6 +48,12 @@ build-images: ## Build all local application images
 	docker build --tag demo-api:local apps/demo-api
 	docker build --tag demo-node:local apps/demo-node
 	docker build --tag demo-go:local apps/demo-go
+
+compose-up: ## Run all application stacks with Docker Compose
+	docker compose up --build
+
+compose-down: ## Stop local Docker Compose workloads
+	docker compose down --remove-orphans
 
 test-gha: ## Run GitHub Actions locally with act
 	act -P ubuntu-latest=catthehacker/ubuntu:act-latest
