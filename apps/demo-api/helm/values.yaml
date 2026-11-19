@@ -19,6 +19,8 @@ rollout:
     - pause: {duration: 60}
     - setWeight: 50
     - pause: {duration: 120}
+telemetry:
+  otlpEndpoint: ""
 ingress:
   enabled: false
   className: nginx

@@ -1,3 +1,4 @@
 image:
   tag: sha-REPLACE_WITH_PROMOTED_COMMIT
 rollout: {enabled: true}
+telemetry: {otlpEndpoint: otel-collector-opentelemetry-collector.monitoring.svc.cluster.local:4317}

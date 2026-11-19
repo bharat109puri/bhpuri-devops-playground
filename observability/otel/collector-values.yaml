@@ -1,0 +1,17 @@
+mode: deployment
+replicaCount: 1
+image:
+  repository: otel/opentelemetry-collector-k8s
+presets:
+  kubernetesAttributes: {enabled: true}
+config:
+  exporters:
+    otlp/jaeger:
+      endpoint: jaeger-collector.monitoring.svc.cluster.local:4317
+      tls: {insecure: true}
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, batch]
+        exporters: [otlp/jaeger]

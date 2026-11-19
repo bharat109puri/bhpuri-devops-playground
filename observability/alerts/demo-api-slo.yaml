@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: demo-api-slo
+  namespace: monitoring
+  labels: {release: monitoring}
+spec:
+  groups:
+    - name: demo-api.availability
+      rules:
+        - alert: DemoApiHighErrorRate
+          expr: sum(rate(http_server_duration_milliseconds_count{http_status_code=~"5.."}[5m])) / clamp_min(sum(rate(http_server_duration_milliseconds_count[5m])), 1) > 0.05
+          for: 5m
+          labels: {severity: warning}
+          annotations:
+            summary: Demo API 5xx rate exceeds 5 percent
+            runbook_url: https://github.com/bharat109puri/bhpuri-devops-playground/blob/main/docs/runbooks/demo-api.md

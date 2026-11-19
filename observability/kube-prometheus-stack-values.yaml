@@ -1,5 +1,6 @@
 grafana:
-  adminPassword: change-me-locally
+  admin:
+    existingSecret: grafana-admin
   sidecar:
     dashboards:
       enabled: true
@@ -11,4 +12,8 @@ prometheus:
       requests: {cpu: 100m, memory: 512Mi}
       limits: {cpu: 500m, memory: 1Gi}
 alertmanager:
-  enabled: false
+  enabled: true
+  config:
+    route: {receiver: local-null}
+    receivers:
+      - name: local-null

@@ -28,9 +28,15 @@ argocd-ui: ## Forward Argo CD UI to https://localhost:8081
 observability-install: ## Install local Prometheus, Grafana, and Loki
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
 	helm repo add grafana https://grafana.github.io/helm-charts --force-update
-	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f observability/kube-prometheus-stack-values.yaml
+	kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+	kubectl -n monitoring create secret generic grafana-admin --from-literal=admin-user=admin --from-literal=admin-password="$${GRAFANA_ADMIN_PASSWORD:-change-me-before-sharing}" --dry-run=client -o yaml | kubectl apply -f -
+	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring -f observability/kube-prometheus-stack-values.yaml
 	helm upgrade --install loki grafana/loki --namespace monitoring -f observability/loki-values.yaml
 	kubectl apply -f observability/demo-api-dashboard.yaml
+	kubectl apply -f observability/otel/jaeger.yaml
+	kubectl apply -f observability/alerts/demo-api-slo.yaml
+	helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts --force-update
+	helm upgrade --install otel-collector open-telemetry/opentelemetry-collector --namespace monitoring -f observability/otel/collector-values.yaml
 
 verify: ## Check the demo application rollout
 	kubectl -n demo-api rollout status deployment/demo-api --timeout=120s
