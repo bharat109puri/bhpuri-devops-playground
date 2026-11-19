@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/bhpuri/bhpuri-devops-playground.git
+    repoURL: https://github.com/bharat109puri/bhpuri-devops-playground.git
     targetRevision: main
     path: apps/demo-api/helm
   destination:
