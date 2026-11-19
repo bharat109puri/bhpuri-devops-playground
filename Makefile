@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap test-gha verify
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap test-gha verify lint render build-images
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -27,6 +27,18 @@ argocd-ui: ## Forward Argo CD UI to https://localhost:8081
 verify: ## Check the demo application rollout
 	kubectl -n demo-api rollout status deployment/demo-api --timeout=120s
 	kubectl -n demo-api get all
+
+lint: ## Lint all Helm charts and render Kubernetes manifests
+	helm lint apps/demo-api/helm
+	helm template demo-api apps/demo-api/helm > /dev/null
+
+render: ## Render GitOps manifests locally
+	kubectl kustomize gitops/overlays/dev > /dev/null
+
+build-images: ## Build all local application images
+	docker build --tag demo-api:local apps/demo-api
+	docker build --tag demo-node:local apps/demo-node
+	docker build --tag demo-go:local apps/demo-go
 
 test-gha: ## Run GitHub Actions locally with act
 	act -P ubuntu-latest=catthehacker/ubuntu:act-latest
