@@ -12,6 +12,11 @@ spec:
     canary:
       stableService: {{ .Chart.Name }}
       canaryService: {{ .Chart.Name }}-canary
+      {{- if .Values.rollout.analysis.enabled }}
+      analysis:
+        templates:
+          - templateName: {{ .Chart.Name }}-success-rate
+      {{- end }}
       steps: {{- toYaml .Values.rollout.steps | nindent 8 }}
   template:
     metadata: {labels: {app.kubernetes.io/name: {{ .Chart.Name }}}}

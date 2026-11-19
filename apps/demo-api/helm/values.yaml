@@ -14,6 +14,9 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
 rollout:
   enabled: false
+  analysis:
+    enabled: false
+    successRateThreshold: 0.95
   steps:
     - setWeight: 20
     - pause: {duration: 60}
