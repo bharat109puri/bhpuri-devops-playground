@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   description: Local DevOps Playground workloads
-  sourceRepos: [https://github.com/bharat109puri/bhpuri-devops-playground.git]
+  sourceRepos: ["https://github.com/bharat109puri/bhpuri-devops-playground.git"]
   destinations:
     - namespace: argocd
       server: https://kubernetes.default.svc
