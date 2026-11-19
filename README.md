@@ -10,10 +10,11 @@ An opinionated, reproducible local platform lab for demonstrating modern deliver
 - Hardened Python, Node.js, and Go container examples
 - Java Spring Boot, PHP, local RAG, LangGraph, and MCP server examples
 - Helm schema validation, HPA, PDB, NetworkPolicy, probes, resource limits, and non-root security context
-- Argo CD project and declarative GitOps foundations
+- Multi-environment Argo CD ApplicationSet and Argo Rollouts canary delivery
 - Kustomize environment overlay and Kubernetes Pod Security admission labels
-- Prometheus, Grafana, Loki, and a versioned Grafana dashboard
-- GitHub Actions for validation, secret/config scanning, SBOMs, multi-architecture image publishing, and Dependabot updates
+- Prometheus, Grafana, Loki, Jaeger, OpenTelemetry Collector, alerting rules, and dashboard-as-code
+- GitHub Actions for validation, ephemeral-Kind deployment tests, secret/config and image scanning, signing, attestations, SBOMs, multi-architecture publishing, and Dependabot updates
+- External Secrets, Kyverno audit policies, Velero backup schedules, and Chaos Mesh drill manifests
 
 ## Architecture
 
@@ -108,14 +109,16 @@ policies/       policy-as-code examples (safe to extend)
 
 Pull requests validate application syntax, Helm templates, and rendered Kubernetes schemas. Security automation scans configuration and git history for high-severity issues and leaked credentials. Merges to `main` publish multi-architecture images to GHCR, attach an SPDX SBOM artifact, and cache BuildKit layers.
 
+The release lab promotes an immutable image reference through development, staging, and production value files. Staging and production render an Argo Rollout canary. The E2E workflow builds the image, loads it into a disposable Kind cluster, installs the Rollouts controller, deploys the canary, and verifies `/healthz`.
+
 The chart uses non-root execution, dropped Linux capabilities, a read-only root filesystem, runtime-default seccomp, resource bounds, probes, a NetworkPolicy, HPA, and PDB. These are pragmatic baseline controls, not a claim that the lab is production-certified.
 
 Read [SECURITY.md](SECURITY.md) before reporting a problem, and [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change.
 
 ## Next experiments
 
-1. Add NGINX Ingress and enable the chart’s Ingress value.
-2. Use External Secrets Operator for cloud credentials.
-3. Promote immutable image digests through GitOps overlays.
-4. Add Kyverno or Gatekeeper policies under `policies/` and run them in CI.
-5. Convert the observability installation into an Argo CD Application.
+1. Add NGINX Ingress and cert-manager with a local issuer.
+2. Configure a cloud secret manager and workload identity in a cloud overlay.
+3. Connect alert notifications to a local receiver and record a complete incident drill.
+4. Enable Kyverno enforcement only after reviewing audit policy reports.
+5. Configure Velero against an object store, run restore drills, and retain the recovery evidence.
