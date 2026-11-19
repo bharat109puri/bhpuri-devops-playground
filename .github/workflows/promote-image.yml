@@ -1,0 +1,52 @@
+name: Promote immutable image
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target GitOps environment
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+      image_tag:
+        description: Immutable image tag produced by Publish images (sha-...)
+        required: true
+        type: string
+
+permissions: {contents: write, pull-requests: write}
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable tag and update environment values
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.environment }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          environment = os.environ["TARGET_ENVIRONMENT"]
+          image_tag = os.environ["IMAGE_TAG"]
+          if environment not in {"dev", "staging", "prod"}:
+              raise SystemExit("unsupported environment")
+          if not re.fullmatch(r"sha-[0-9a-f]{40}", image_tag):
+              raise SystemExit("image tag must be a full immutable sha-<40 hex> tag")
+          values = Path(f"apps/demo-api/helm/environments/{environment}.yaml")
+          values.write_text(re.sub(r"(?m)^(\s*tag:)\s*.*$", rf"\1 {image_tag}", values.read_text()))
+          PY
+      - name: Create promotion pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: promote demo-api to ${{ inputs.environment }}'
+          branch: promote/demo-api-${{ inputs.environment }}-${{ inputs.image_tag }}
+          title: 'Promote demo-api to ${{ inputs.environment }}'
+          body: |
+            Promotes demo-api using immutable image tag `${{ inputs.image_tag }}`.
+
+            Review the deployment environment, canary analysis, and image provenance before merging.
+          labels: deployment,promotion
