@@ -1,0 +1,39 @@
+name: End-to-end Kind validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {contents: read}
+
+jobs:
+  deploy-and-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: playground-ci
+      - uses: azure/setup-helm@v4
+      - name: Build and load test image
+        run: |
+          docker build --tag demo-api:test apps/demo-api
+          kind load docker-image demo-api:test --name playground-ci
+      - name: Install Argo Rollouts controller
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm upgrade --install argo-rollouts argo/argo-rollouts --namespace argo-rollouts --create-namespace --wait
+      - name: Deploy canary workload
+        run: |
+          helm upgrade --install demo-api apps/demo-api/helm --namespace demo-api --create-namespace \
+            --set image.repository=demo-api --set image.tag=test --set image.pullPolicy=Never \
+            --set rollout.enabled=true --set autoscaling.enabled=false
+          kubectl -n demo-api rollout status rollout/demo-api --timeout=180s
+      - name: Verify service health
+        run: |
+          kubectl -n demo-api port-forward svc/demo-api 8080:80 >/tmp/port-forward.log 2>&1 &
+          for _ in $(seq 1 20); do curl --fail --silent http://127.0.0.1:8080/healthz && exit 0; sleep 2; done
+          cat /tmp/port-forward.log
+          kubectl -n demo-api get pods -o wide
+          exit 1
