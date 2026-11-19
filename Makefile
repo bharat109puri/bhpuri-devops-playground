@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap test-gha verify lint render build-images
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install test-gha verify lint render build-images
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -25,6 +25,13 @@ argocd-password: ## Print the initial Argo CD admin password
 
 argocd-ui: ## Forward Argo CD UI to https://localhost:8081
 	kubectl -n argocd port-forward svc/argocd-server 8081:443
+
+observability-install: ## Install local Prometheus, Grafana, and Loki
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+	helm repo add grafana https://grafana.github.io/helm-charts --force-update
+	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f observability/kube-prometheus-stack-values.yaml
+	helm upgrade --install loki grafana/loki --namespace monitoring -f observability/loki-values.yaml
+	kubectl apply -f observability/demo-api-dashboard.yaml
 
 verify: ## Check the demo application rollout
 	kubectl -n demo-api rollout status deployment/demo-api --timeout=120s
