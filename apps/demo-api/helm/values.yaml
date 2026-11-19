@@ -12,6 +12,13 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 5
   targetCPUUtilizationPercentage: 70
+rollout:
+  enabled: false
+  steps:
+    - setWeight: 20
+    - pause: {duration: 60}
+    - setWeight: 50
+    - pause: {duration: 120}
 ingress:
   enabled: false
   className: nginx

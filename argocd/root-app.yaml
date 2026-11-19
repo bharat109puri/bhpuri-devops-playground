@@ -1,17 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: demo-api
+  name: playground-root
   namespace: argocd
 spec:
   project: playground
   source:
     repoURL: https://github.com/bharat109puri/bhpuri-devops-playground.git
     targetRevision: main
-    path: apps/demo-api/helm
+    path: argocd/applications
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo-api
+    namespace: argocd
   syncPolicy:
     automated: {prune: true, selfHeal: true}
     syncOptions: [CreateNamespace=true]

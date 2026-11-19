@@ -7,8 +7,16 @@ spec:
   description: Local DevOps Playground workloads
   sourceRepos: [https://github.com/bharat109puri/bhpuri-devops-playground.git]
   destinations:
-    - namespace: '*'
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: demo-api-dev
+      server: https://kubernetes.default.svc
+    - namespace: demo-api-staging
+      server: https://kubernetes.default.svc
+    - namespace: demo-api-prod
+      server: https://kubernetes.default.svc
+    - namespace: playground
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: ''
+      kind: Namespace

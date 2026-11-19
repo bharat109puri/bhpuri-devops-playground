@@ -1,0 +1,3 @@
+image:
+  tag: sha-REPLACE_WITH_APPROVED_COMMIT
+rollout: {enabled: true}
