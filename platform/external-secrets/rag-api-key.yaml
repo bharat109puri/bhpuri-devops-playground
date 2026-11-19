@@ -1,0 +1,12 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: rag-api-key
+  namespace: playground
+spec:
+  refreshInterval: 1h
+  secretStoreRef: {name: local-kubernetes-store, kind: SecretStore}
+  target: {name: rag-api-key, creationPolicy: Owner}
+  data:
+    - secretKey: api-key
+      remoteRef: {key: local-rag-source, property: api-key}

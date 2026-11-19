@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata: {name: require-workload-baseline}
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: require-non-root
+      match: {any: [{resources: {kinds: [Pod]}}]}
+      validate:
+        message: Pods must run as non-root.
+        pattern: {spec: {securityContext: {runAsNonRoot: true}}}
+    - name: disallow-latest
+      match: {any: [{resources: {kinds: [Pod]}}]}
+      validate:
+        message: Mutable image tags are not allowed.
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"

@@ -1,0 +1,11 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata: {name: demo-api-pod-kill, namespace: demo-api-staging}
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces: [demo-api-staging]
+    labelSelectors: {app.kubernetes.io/name: demo-api}
+  duration: 30s
+  scheduler: {cron: "0 3 * * 5"}

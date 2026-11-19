@@ -1,0 +1,15 @@
+apiVersion: velero.io/v1
+kind: Schedule
+metadata: {name: playground-daily, namespace: velero}
+spec:
+  schedule: "0 2 * * *"
+  template:
+    includedNamespaces: [playground, demo-api-dev, demo-api-staging, demo-api-prod]
+    ttl: 168h0m0s
+---
+apiVersion: velero.io/v1
+kind: Backup
+metadata: {generateName: playground-before-chaos-, namespace: velero}
+spec:
+  includedNamespaces: [playground]
+  ttl: 24h0m0s

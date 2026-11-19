@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install test-gha verify lint render build-images compose-up compose-down
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install platform-operators-install platform-config-apply test-gha verify lint render build-images compose-up compose-down
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -37,6 +37,18 @@ observability-install: ## Install local Prometheus, Grafana, and Loki
 	kubectl apply -f observability/alerts/demo-api-slo.yaml
 	helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts --force-update
 	helm upgrade --install otel-collector open-telemetry/opentelemetry-collector --namespace monitoring -f observability/otel/collector-values.yaml
+
+platform-operators-install: ## Install local policy and external-secret operators
+	helm repo add external-secrets https://charts.external-secrets.io --force-update
+	helm repo add kyverno https://kyverno.github.io/kyverno/ --force-update
+	helm upgrade --install external-secrets external-secrets/external-secrets --namespace external-secrets --create-namespace
+	helm upgrade --install kyverno kyverno/kyverno --namespace kyverno --create-namespace
+
+platform-config-apply: ## Apply local secrets, policy, backup, and chaos drill manifests
+	kubectl apply -f platform/external-secrets/local-store.yaml
+	kubectl apply -f platform/external-secrets/rag-api-key.yaml
+	kubectl apply -f platform/kyverno/policies.yaml
+	@echo "Velero and Chaos Mesh CRDs are intentionally installed separately; see docs/platform-operations.md."
 
 verify: ## Check the demo application rollout
 	kubectl -n demo-api rollout status deployment/demo-api --timeout=120s
