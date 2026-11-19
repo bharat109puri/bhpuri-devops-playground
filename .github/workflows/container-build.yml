@@ -1,0 +1,42 @@
+name: Container build validation
+
+on:
+  pull_request:
+    paths:
+      - 'apps/**'
+      - '.github/workflows/container-build.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - '.github/workflows/container-build.yml'
+
+permissions: {contents: read}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: demo-api, context: apps/demo-api}
+          - {name: demo-node, context: apps/demo-node}
+          - {name: demo-go, context: apps/demo-go}
+          - {name: demo-spring, context: apps/demo-spring}
+          - {name: demo-php, context: apps/demo-php}
+          - {name: ai-rag, context: apps/ai-rag}
+          - {name: ai-langgraph, context: apps/ai-langgraph}
+          - {name: mcp-tool-server, context: apps/mcp-tool-server}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: false
+          load: false
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
