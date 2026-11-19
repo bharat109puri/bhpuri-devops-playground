@@ -1,0 +1,42 @@
+name: Continuous integration
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {contents: read}
+
+jobs:
+  validate-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint chart
+        run: helm lint apps/demo-api/helm
+      - name: Render chart
+        run: helm template demo-api apps/demo-api/helm > rendered-demo-api.yaml
+      - name: Validate Kubernetes schema
+        uses: docker://ghcr.io/yannh/kubeconform:latest
+        with:
+          args: -strict -summary rendered-demo-api.yaml
+  unit-and-syntax:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - stack: python
+            command: python -m compileall apps/demo-api/src
+          - stack: node
+            command: node --check apps/demo-node/src/server.js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        if: matrix.stack == 'python'
+        with: {python-version: '3.13'}
+      - uses: actions/setup-node@v4
+        if: matrix.stack == 'node'
+        with: {node-version: '22'}
+      - run: ${{ matrix.command }}
