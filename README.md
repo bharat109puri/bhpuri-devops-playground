@@ -90,6 +90,7 @@ Every service listens on port `8080` and exposes `GET /healthz`.
 
 See [application stack notes](docs/application-stacks.md) for the design differences.
 Read [the AI and MCP guide](docs/ai-and-mcp.md) before connecting model credentials or an MCP host.
+Use the [polyglot deployment guide](docs/deploy-polyglot.md) to deploy the additional services with the shared chart.
 
 ## Repository layout
 
