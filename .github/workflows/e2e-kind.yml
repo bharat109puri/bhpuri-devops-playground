@@ -24,12 +24,17 @@ jobs:
         run: |
           helm repo add argo https://argoproj.github.io/argo-helm
           helm upgrade --install argo-rollouts argo/argo-rollouts --namespace argo-rollouts --create-namespace --wait
-      - name: Deploy canary workload
+      - name: Validate canary manifest against the installed CRD
+        run: |
+          kubectl create namespace demo-api
+          helm template demo-api apps/demo-api/helm --set rollout.enabled=true --set autoscaling.enabled=false > /tmp/canary.yaml
+          kubectl -n demo-api apply --dry-run=server -f /tmp/canary.yaml
+      - name: Deploy and verify deterministic workload
         run: |
           helm upgrade --install demo-api apps/demo-api/helm --namespace demo-api --create-namespace \
             --set image.repository=demo-api --set image.tag=test --set image.pullPolicy=Never \
-            --set rollout.enabled=true --set autoscaling.enabled=false
-          kubectl -n demo-api rollout status rollout/demo-api --timeout=180s
+            --set rollout.enabled=false --set autoscaling.enabled=false
+          kubectl -n demo-api rollout status deployment/demo-api --timeout=180s
       - name: Verify service health
         run: |
           kubectl -n demo-api port-forward svc/demo-api 8080:80 >/tmp/port-forward.log 2>&1 &

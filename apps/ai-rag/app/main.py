@@ -9,7 +9,7 @@ app = FastAPI(title="Local RAG demo", version="0.1.0")
 KNOWLEDGE_BASE = [
     Document(page_content="Kind creates disposable Kubernetes clusters using Docker nodes.", metadata={"source": "kind"}),
     Document(page_content="Argo CD continuously reconciles declarative Git state into Kubernetes resources.", metadata={"source": "argocd"}),
-    Document(page_content="A software bill of materials records components included in a container image.", metadata={"source": "sbom"}),
+    Document(page_content="An SBOM, or software bill of materials, records components included in a container image.", metadata={"source": "sbom"}),
 ]
 
 
