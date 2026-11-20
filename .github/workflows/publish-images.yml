@@ -19,6 +19,10 @@ jobs:
             context: apps/demo-api
           - name: demo-frontend
             context: apps/demo-frontend
+          - name: commerce-api
+            context: apps/commerce-platform/api
+          - name: commerce-frontend
+            context: apps/commerce-platform/frontend
           - name: demo-node
             context: apps/demo-node
           - name: demo-go

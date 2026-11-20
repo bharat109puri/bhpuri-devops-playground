@@ -30,7 +30,7 @@ jobs:
       matrix:
         include:
           - stack: python
-            command: python -m pip install -r apps/demo-api/requirements-dev.txt && pytest apps/demo-api/tests
+            command: python -m pip install -r apps/demo-api/requirements-dev.txt && pytest apps/demo-api/tests && python -m compileall apps/commerce-platform/api/app
           - stack: node
             command: node --check apps/demo-node/src/server.js && node --check apps/demo-frontend/src/server.js && node --check apps/demo-frontend/public/app.js
           - stack: ai-python

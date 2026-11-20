@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap ingress-install frontend-deploy-local frontend-access observability-install platform-operators-install platform-config-apply test-gha verify lint render build-images compose-up compose-down
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap ingress-install frontend-deploy-local frontend-access commerce-stack-deploy-local commerce-stack-access observability-install platform-operators-install platform-config-apply test-gha verify lint render build-images compose-up compose-down
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -38,6 +38,18 @@ frontend-deploy-local: ## Build, load, and deploy the Node frontend to Kind
 
 frontend-access: ## Forward the frontend to http://localhost:8082
 	kubectl -n playground port-forward svc/demo-frontend 8082:80
+
+commerce-stack-deploy-local: ## Build and deploy MySQL, Redis, NATS, APIs, ingest, and frontend
+	docker build --tag commerce-api:local apps/commerce-platform/api
+	docker build --tag commerce-frontend:local apps/commerce-platform/frontend
+	kind load docker-image commerce-api:local commerce-frontend:local --name $(CLUSTER_NAME)
+	helm upgrade --install commerce-platform apps/commerce-platform/helm --namespace commerce --create-namespace
+	kubectl -n commerce rollout status statefulset/commerce-platform-mysql --timeout=240s
+	kubectl -n commerce rollout status deployment/catalog-api --timeout=180s
+	kubectl -n commerce rollout status deployment/commerce-platform-frontend --timeout=180s
+
+commerce-stack-access: ## Forward commerce frontend to http://localhost:8083
+	kubectl -n commerce port-forward svc/commerce-platform-frontend 8083:80
 
 observability-install: ## Install local Prometheus, Grafana, and Loki
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
@@ -78,6 +90,8 @@ render: ## Render GitOps manifests locally
 build-images: ## Build all local application images
 	docker build --tag demo-api:local apps/demo-api
 	docker build --tag demo-frontend:local apps/demo-frontend
+	docker build --tag commerce-api:local apps/commerce-platform/api
+	docker build --tag commerce-frontend:local apps/commerce-platform/frontend
 	docker build --tag demo-node:local apps/demo-node
 	docker build --tag demo-go:local apps/demo-go
 	docker build --tag demo-spring:local apps/demo-spring

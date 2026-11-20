@@ -1,0 +1,18 @@
+images:
+  api: {repository: commerce-api, tag: local, pullPolicy: Never}
+  frontend: {repository: commerce-frontend, tag: local, pullPolicy: Never}
+mysql: {image: mysql:8.4, storage: 1Gi}
+redis: {image: redis:7.4-alpine}
+nats: {image: nats:2.10-alpine}
+database:
+  name: commerce
+  user: commerce
+  # Local-lab credentials only. Use an external Secret in real environments.
+  rootPassword: playground-root-password
+  password: playground-app-password
+apiServices: [catalog-api, orders-api, events-api]
+frontend: {replicas: 2}
+ingress: {enabled: true, className: nginx, host: commerce.local}
+resources:
+  api: {requests: {cpu: 50m, memory: 96Mi}, limits: {cpu: 250m, memory: 256Mi}}
+  frontend: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 150m, memory: 128Mi}}

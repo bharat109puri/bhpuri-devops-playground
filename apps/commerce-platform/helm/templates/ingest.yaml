@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: {{ .Chart.Name }}-ingest}
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: ingest
+          image: "{{ .Values.images.api.repository }}:{{ .Values.images.api.tag }}"
+          imagePullPolicy: {{ .Values.images.api.pullPolicy }}
+          command: [python, -m, app.ingest]
+          env:
+            - {name: MYSQL_HOST, value: {{ printf "%s-mysql" .Chart.Name | quote }}}
+            - {name: MYSQL_DATABASE, value: {{ .Values.database.name | quote }}}
+            - {name: MYSQL_USER, value: {{ .Values.database.user | quote }}}
+            - {name: NATS_HOST, value: {{ printf "%s-nats" .Chart.Name | quote }}}
+            - name: MYSQL_PASSWORD
+              valueFrom: {secretKeyRef: {name: {{ .Chart.Name }}-database, key: password}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
