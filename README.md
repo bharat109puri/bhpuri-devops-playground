@@ -120,6 +120,7 @@ Every service listens on port `8080` and exposes `GET /healthz`.
 See [application stack notes](docs/application-stacks.md) for the design differences.
 Read [the AI and MCP guide](docs/ai-and-mcp.md) before connecting model credentials or an MCP host.
 Use the [polyglot deployment guide](docs/deploy-polyglot.md) to deploy the additional services with the shared chart.
+Build the [commerce platform stack](apps/commerce-platform/README.md) for a full Kubernetes workload with MySQL, Redis, NATS, an ingest Job, Python APIs, and a Node.js frontend.
 
 ## Repository layout
 
