@@ -1,0 +1,15 @@
+replicaCount: 2
+image:
+  repository: ghcr.io/bharat109puri/demo-frontend
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+service:
+  port: 80
+  targetPort: 8080
+ingress:
+  enabled: false
+  className: nginx
+  host: frontend.local
+resources:
+  requests: {cpu: 25m, memory: 32Mi}
+  limits: {cpu: 150m, memory: 128Mi}

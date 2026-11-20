@@ -21,6 +21,7 @@ jobs:
       matrix:
         include:
           - {name: demo-api, context: apps/demo-api}
+          - {name: demo-frontend, context: apps/demo-frontend}
           - {name: demo-node, context: apps/demo-node}
           - {name: demo-go, context: apps/demo-go}
           - {name: demo-spring, context: apps/demo-spring}

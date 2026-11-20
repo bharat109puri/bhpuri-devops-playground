@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A Node.js frontend deployed to the DevOps Playground.">
+    <title>DevOps Playground Frontend</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Kubernetes delivery lab</p>
+      <h1>Node.js frontend is live.</h1>
+      <p class="intro">A tiny, dependency-free frontend served by Node, deployed with Helm, and ready for a Kind or Argo CD workflow.</p>
+      <section aria-label="Deployment capabilities">
+        <article><strong>Build</strong><span>Hardened non-root container</span></article>
+        <article><strong>Deploy</strong><span>Helm release with probes</span></article>
+        <article><strong>Expose</strong><span>Service, port-forward, or Ingress</span></article>
+      </section>
+      <p id="status" role="status">Checking health endpoint…</p>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

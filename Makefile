@@ -2,7 +2,7 @@ CLUSTER_NAME := bhpuri-lab
 KIND_CONTEXT := kind-$(CLUSTER_NAME)
 
 .DEFAULT_GOAL := help
-.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap observability-install platform-operators-install platform-config-apply test-gha verify lint render build-images compose-up compose-down
+.PHONY: help up down argocd-install argocd-password argocd-ui bootstrap ingress-install frontend-deploy-local frontend-access observability-install platform-operators-install platform-config-apply test-gha verify lint render build-images compose-up compose-down
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z_-]+:.*##/ {printf "\\033[36m%-18s\\033[0m %s\\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -24,6 +24,20 @@ argocd-password: ## Print the initial Argo CD admin password
 
 argocd-ui: ## Forward Argo CD UI to https://localhost:8081
 	kubectl -n argocd port-forward svc/argocd-server 8081:443
+
+ingress-install: ## Install ingress-nginx for Kind host ports 8080 and 8443
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml
+	kubectl -n ingress-nginx rollout status deployment/ingress-nginx-controller --timeout=180s
+
+frontend-deploy-local: ## Build, load, and deploy the Node frontend to Kind
+	docker build --tag demo-frontend:local apps/demo-frontend
+	kind load docker-image demo-frontend:local --name $(CLUSTER_NAME)
+	helm upgrade --install demo-frontend apps/demo-frontend/helm --namespace playground --create-namespace \
+		--set image.repository=demo-frontend --set image.tag=local --set image.pullPolicy=Never
+	kubectl -n playground rollout status deployment/demo-frontend --timeout=180s
+
+frontend-access: ## Forward the frontend to http://localhost:8082
+	kubectl -n playground port-forward svc/demo-frontend 8082:80
 
 observability-install: ## Install local Prometheus, Grafana, and Loki
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
@@ -63,6 +77,7 @@ render: ## Render GitOps manifests locally
 
 build-images: ## Build all local application images
 	docker build --tag demo-api:local apps/demo-api
+	docker build --tag demo-frontend:local apps/demo-frontend
 	docker build --tag demo-node:local apps/demo-node
 	docker build --tag demo-go:local apps/demo-go
 	docker build --tag demo-spring:local apps/demo-spring

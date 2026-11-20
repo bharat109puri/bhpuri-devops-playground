@@ -54,6 +54,33 @@ kubectl -n demo-api port-forward svc/demo-api 8080:80
 curl http://localhost:8080/healthz
 ```
 
+## Node frontend: build, deploy, and access
+
+The `demo-frontend` application is a dependency-free Node.js frontend with hardened runtime defaults, Kubernetes health probes, a ClusterIP Service, and an optional Ingress.
+
+For a fully local Kind deployment (no registry pull), run:
+
+```sh
+make frontend-deploy-local
+make frontend-access
+```
+
+Open [http://localhost:8082](http://localhost:8082). Keep `make frontend-access` running while you use the page. Verify its endpoints from a second terminal:
+
+```sh
+curl --fail http://localhost:8082/healthz
+curl --fail http://localhost:8082/readyz
+```
+
+For hostname-based access, first install the Kind ingress controller and then point the host header at the mapped Kind port:
+
+```sh
+make ingress-install
+curl --fail --resolve frontend.local:8080:127.0.0.1 http://frontend.local:8080/
+```
+
+The Argo CD application is configured for the Kind-local `demo-frontend:local` image, so it reconciles after `make frontend-deploy-local` has loaded that image. Add `127.0.0.1 frontend.local` to your local hosts file, then browse to `http://frontend.local:8080`. For registry delivery, replace the four image parameters in `argocd/applications/demo-frontend.yaml` with the published immutable GHCR tag.
+
 Use `make down` to remove the cluster.
 
 ## Local workflows
@@ -81,6 +108,7 @@ Every service listens on port `8080` and exposes `GET /healthz`.
 | Service | Stack | Container approach |
 | --- | --- | --- |
 | `demo-api` | Flask + Gunicorn | multi-stage Python virtual environment, non-root runtime |
+| `demo-frontend` | Node.js static frontend | dependency-free HTTP server, non-root runtime, Helm Service and Ingress |
 | `demo-node` | Node.js HTTP | minimal Alpine, non-root runtime |
 | `demo-go` | Go HTTP | static binary in distroless non-root image |
 | `demo-spring` | Java Spring Boot | Maven build with Java 21 JRE runtime |

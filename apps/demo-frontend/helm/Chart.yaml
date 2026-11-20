@@ -1,0 +1,6 @@
+apiVersion: v2
+name: demo-frontend
+description: A hardened Node.js frontend for the DevOps Playground
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-frontend
+  namespace: argocd
+spec:
+  project: playground
+  source:
+    repoURL: https://github.com/bharat109puri/bhpuri-devops-playground.git
+    targetRevision: main
+    path: apps/demo-frontend/helm
+    helm:
+      parameters:
+        - name: image.repository
+          value: demo-frontend
+        - name: image.tag
+          value: local
+        - name: image.pullPolicy
+          value: Never
+        - name: ingress.enabled
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: playground
+  syncPolicy:
+    automated: {prune: true, selfHeal: true}
+    syncOptions: [CreateNamespace=true]
