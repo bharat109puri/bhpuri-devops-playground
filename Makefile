@@ -33,7 +33,7 @@ frontend-deploy-local: ## Build, load, and deploy the Node frontend to Kind
 	docker build --tag demo-frontend:local apps/demo-frontend
 	kind load docker-image demo-frontend:local --name $(CLUSTER_NAME)
 	helm upgrade --install demo-frontend apps/demo-frontend/helm --namespace playground --create-namespace \
-		--set image.repository=demo-frontend --set image.tag=local --set image.pullPolicy=Never
+		--set image.repository=demo-frontend --set image.tag=local --set image.pullPolicy=Never --set ingress.enabled=true
 	kubectl -n playground rollout status deployment/demo-frontend --timeout=180s
 
 frontend-access: ## Forward the frontend to http://localhost:8082
