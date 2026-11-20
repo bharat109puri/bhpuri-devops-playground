@@ -20,7 +20,7 @@ jobs:
       - name: Lint generic deployment chart
         run: helm lint charts/web-service
       - name: Validate Kubernetes schema
-        uses: docker://ghcr.io/yannh/kubeconform:latest
+        uses: docker://ghcr.io/yannh/kubeconform:v0.8.0-alpine
         with:
           args: -strict -summary rendered-demo-api.yaml
   unit-and-syntax:
