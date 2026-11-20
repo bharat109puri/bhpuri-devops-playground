@@ -19,10 +19,14 @@ jobs:
         run: helm template demo-api apps/demo-api/helm > rendered-demo-api.yaml
       - name: Lint generic deployment chart
         run: helm lint charts/web-service
+      - name: Lint commerce platform chart
+        run: helm lint apps/commerce-platform/helm
+      - name: Render commerce platform chart
+        run: helm template commerce-platform apps/commerce-platform/helm > rendered-commerce-platform.yaml
       - name: Validate Kubernetes schema
         uses: docker://ghcr.io/yannh/kubeconform:v0.8.0-alpine
         with:
-          args: -strict -summary rendered-demo-api.yaml
+          args: -strict -summary rendered-demo-api.yaml rendered-commerce-platform.yaml
   unit-and-syntax:
     runs-on: ubuntu-latest
     strategy:
