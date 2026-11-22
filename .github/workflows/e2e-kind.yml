@@ -35,6 +35,12 @@ jobs:
             --set image.repository=demo-api --set image.tag=test --set image.pullPolicy=Never \
             --set rollout.enabled=false --set autoscaling.enabled=false
           kubectl -n demo-api rollout status deployment/demo-api --timeout=180s
+      - name: Collect workload diagnostics on failure
+        if: failure()
+        run: |
+          kubectl -n demo-api get all -o wide || true
+          kubectl -n demo-api get events --sort-by=.lastTimestamp || true
+          kubectl -n demo-api logs deployment/demo-api --all-containers --tail=200 || true
       - name: Verify service health
         run: |
           kubectl -n demo-api port-forward svc/demo-api 8080:80 >/tmp/port-forward.log 2>&1 &

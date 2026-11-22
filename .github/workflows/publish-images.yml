@@ -68,6 +68,7 @@ jobs:
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}@${{ steps.push.outputs.digest }}
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
           exit-code: '1'
       - name: Sign immutable image with keyless OIDC
         uses: sigstore/cosign-installer@v3

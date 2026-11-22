@@ -9,9 +9,9 @@ deny[msg] {
 
 deny[msg] {
   input.kind == "Deployment"
-  container := input.spec.template.spec.containers[_]
-  not container.securityContext.runAsNonRoot
-  msg := sprintf("%s must run as non-root", [container.name])
+  pod_security_context := input.spec.template.spec.securityContext
+  not pod_security_context.runAsNonRoot
+  msg := sprintf("%s must run as non-root", [input.metadata.name])
 }
 
 deny[msg] {

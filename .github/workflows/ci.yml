@@ -34,9 +34,9 @@ jobs:
       matrix:
         include:
           - stack: python
-            command: python -m pip install -r apps/demo-api/requirements-dev.txt && pytest apps/demo-api/tests && python -m compileall apps/commerce-platform/api/app
+            command: python -m pip install -r apps/demo-api/requirements-dev.txt && PYTHONPATH=apps/demo-api pytest apps/demo-api/tests && python -m compileall apps/commerce-platform/api/app
           - stack: node
-            command: node --check apps/demo-node/src/server.js && node --check apps/demo-frontend/src/server.js && node --check apps/demo-frontend/public/app.js
+            command: node --check apps/demo-node/src/server.js && node --check apps/demo-frontend/src/server.js && node --check apps/demo-frontend/public/app.js && node --test apps/demo-frontend/tests/server.test.js
           - stack: ai-python
             command: python -m pip install -r apps/ai-rag/requirements.txt -r apps/ai-langgraph/requirements.txt && PYTHONPATH=apps/ai-rag pytest apps/ai-rag/tests && python -m compileall apps/ai-langgraph/app
           - stack: java

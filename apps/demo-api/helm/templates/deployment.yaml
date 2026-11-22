@@ -30,4 +30,9 @@ spec:
           resources: {{- toYaml .Values.resources | nindent 12 }}
           readinessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 3}
           livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

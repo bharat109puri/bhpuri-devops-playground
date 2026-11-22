@@ -12,12 +12,20 @@ spec:
   template:
     metadata: {labels: {app: {{ .Chart.Name }}-redis}}
     spec:
+      securityContext: {runAsNonRoot: true, fsGroup: 999, seccompProfile: {type: RuntimeDefault}}
       containers:
         - name: redis
           image: {{ .Values.redis.image | quote }}
           args: [redis-server, --save, "", --appendonly, "no"]
           ports: [{name: redis, containerPort: 6379}]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 100m, memory: 128Mi}}
+          volumeMounts:
+            - {name: data, mountPath: /data}
           readinessProbe: {exec: {command: [redis-cli, ping]}, initialDelaySeconds: 3}
+      volumes:
+        - name: data
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -33,8 +41,16 @@ spec:
   template:
     metadata: {labels: {app: {{ .Chart.Name }}-nats}}
     spec:
+      securityContext: {runAsNonRoot: true, seccompProfile: {type: RuntimeDefault}}
       containers:
         - name: nats
           image: {{ .Values.nats.image | quote }}
           ports: [{name: client, containerPort: 4222}]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 100m, memory: 128Mi}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
           readinessProbe: {tcpSocket: {port: client}, initialDelaySeconds: 3}
+      volumes:
+        - name: tmp
+          emptyDir: {}
